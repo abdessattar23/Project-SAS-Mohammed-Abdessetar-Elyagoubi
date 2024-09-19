@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 
+
 struct Client{
     int id;
     char fullname[70];
