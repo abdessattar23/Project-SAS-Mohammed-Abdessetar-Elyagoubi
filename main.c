@@ -40,6 +40,7 @@ void manage_users();
 void user_menu(int users_id);
 void create(int user_id);
 void modify_u(); // modify a ticket as a client not admin
+void modify_m();
 void display_user_tickets(int user_id);
 void delete_user_ticket(int user_id);
 void delete_mod_ticket();
@@ -48,12 +49,17 @@ int check_creds(int id, char pass[]);
 int verify_password(char pass[], char name[]);
 void moderator_menu();
 void manage_tickets_mod();
+
 void modify_m();
 void menu();
+void searchbyCID(int target_id);
+void searchbyStatus(int stat);
 
 void searchbyID(int target_id);
 void searchbyCat(char cat[]);
 void searchbyDate(char date[]);
+void process();
+void process_tickets();
 
 void searchbyDate(char date[])
 {
@@ -369,7 +375,7 @@ void create(int user_id)
     getnow = time(NULL);
     tickets[tickets_count].date = getnow;
     printf("La reclamation a ete enregistree avec succes!\n");
-    printf("Reclamation Identifiant: %d", tickets[tickets_count].id);
+    printf("Reclamation Identifiant: %d\nOwner: %d\n", tickets[tickets_count].id, tickets[tickets_count].owner_id);
     tickets_count++;
 }
 
@@ -411,16 +417,18 @@ void delete_user_ticket(int user_id)
     {
         if (user_id == tickets[target_id].owner_id)
         {
-            for (int i = target_id; i < tickets_count - 1; i++)
+            for (int i = 0; i < tickets_count - 1; i++)
             {
                 tickets[i] = tickets[i + 1];
+                tickets[i].id -= 1;
             }
             tickets_count--;
             printf("Reclamation supprime avec succes!\n");
+            return;
         }
         else
         {
-            printf("Vous n'avez pas le droit de supprimer cette reclamation!\n");
+            printf("Vous n'avez pas le droit de supprimer cette reclamation! Car owner is : %d\n", tickets[target_id].owner_id);
             return;
         }
     }
@@ -445,38 +453,7 @@ void display_user_tickets(int user_id)
         }
     }
 }
-
-/* Moderator Menu: Displays the moderator menu */
-void moderator_menu()
-{
-    int choix;
-    do
-    {
-        printf("===============MENU===============\n");
-        printf("[1] Gestion des Reclamations\n");
-        printf("[2] Traitement des Reclamations\n");
-        printf("[3] Retour\n");
-        printf("==================================\n");
-        printf("Entrer Votre choix: ");
-        scanf("%d", &choix);
-        getchar();
-        switch (choix)
-        {
-        case 1:
-            manage_tickets_mod();
-            break;
-        case 2:
-            proccess_tickets(); // Proccess Tickets as Mode
-            break;
-        case 3:
-            break;
-        default:
-            printf("Choix Incorrect!!!\n");
-            break;
-        }
-    } while (choix != 3);
-}
-void proccess()
+void process()
 {
     int target_id;
     printf("Entrer l'ID du reclamation: ");
@@ -516,6 +493,37 @@ void process_tickets()
             break;
         case 2:
             process(); // Proccess Tickets as Mode
+            break;
+        case 3:
+            break;
+        default:
+            printf("Choix Incorrect!!!\n");
+            break;
+        }
+    } while (choix != 3);
+}
+
+/* Moderator Menu: Displays the moderator menu */
+void moderator_menu()
+{
+    int choix;
+    do
+    {
+        printf("===============MENU===============\n");
+        printf("[1] Gestion des Reclamations\n");
+        printf("[2] Traitement des Reclamations\n");
+        printf("[3] Retour\n");
+        printf("==================================\n");
+        printf("Entrer Votre choix: ");
+        scanf("%d", &choix);
+        getchar();
+        switch (choix)
+        {
+        case 1:
+            manage_tickets_mod();
+            break;
+        case 2:
+            process_tickets(); // Proccess Tickets as Mode
             break;
         case 3:
             break;
