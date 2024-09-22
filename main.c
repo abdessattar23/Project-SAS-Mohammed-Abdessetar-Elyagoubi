@@ -39,7 +39,7 @@ void login_admin();
 void manage_users();
 void user_menu(int users_id);
 void create(int user_id);
-void modify_u();//modify a ticket as a client not admin
+void modify_u(); // modify a ticket as a client not admin
 void display_user_tickets(int user_id);
 void delete_user_ticket();
 void admin_menu();
@@ -48,7 +48,7 @@ int verify_password(char pass[], char name[]);
 void moderator_menu();
 void manage_tickets_mod();
 
-/* Signup Function */
+/* Signup Function: Registers a new user */
 void signup()
 {
     printf("Entrer Votre nom complet: ");
@@ -76,7 +76,7 @@ void signup()
     users_count++;
 }
 
-/*Modify a Ticket as a Client*/
+/* Modify a Ticket as a Client */
 void modify_u()
 {
     int entred_ticket_id;
@@ -101,7 +101,7 @@ void modify_u()
     printf("La reclamation a modifiee avec succes!\n");
 }
 
-/* Create Ticket*/
+/* Create Ticket: Allows a user to create a new ticket */
 void create(int user_id)
 {
     time_t getnow;
@@ -114,7 +114,7 @@ void create(int user_id)
     printf("Entrer la categorie: ");
     fgets(tickets[tickets_count].categorie, 20, stdin);
     tickets[tickets_count].categorie[strcspn(tickets[tickets_count].categorie, "\n")] = '\0';
-    tickets[tickets_count].status = 0; //0 pending; 1: en cours; 2: resolu; 3: fermee
+    tickets[tickets_count].status = 0; // 0 pending; 1: en cours; 2: resolu; 3: fermee
     tickets[tickets_count].owner_id = user_id;
     tickets[tickets_count].id = tickets_count + 1;
     getnow = time(NULL);
@@ -123,22 +123,24 @@ void create(int user_id)
     printf("Reclamation Identifiant: %d", tickets[tickets_count].id);
     tickets_count++;
 }
-/* Display all User tickets */
+
+/* Display all User tickets: Shows all tickets for a specific user */
 void display_user_tickets(int user_id)
 {
-    for(int i=0; i <tickets_count; i++)
+    for (int i = 0; i < tickets_count; i++)
     {
-        if(tickets[i].owner_id == user_id)
+        if (tickets[i].owner_id == user_id)
         {
             char date[20];
             strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
             printf("==============Reclamation %d==============\n", i);
-            printf("Identifiant: %d\nMotif: %s\nDescription: %s\nCategorie: %s\nStatus: %d\nDate: %s\n", tickets[i].id,tickets[i].motif, tickets[i].description, tickets[i].categorie, tickets[i].status, date);
+            printf("Identifiant: %d\nMotif: %s\nDescription: %s\nCategorie: %s\nStatus: %d\nDate: %s\n", tickets[i].id, tickets[i].motif, tickets[i].description, tickets[i].categorie, tickets[i].status, date);
             printf("==========================================\n");
         }
     }
 }
-/* Delete User Ticket */
+
+/* Delete User Ticket: Deletes a specific ticket */
 void delete_user_ticket()
 {
     time_t newt;
@@ -160,9 +162,9 @@ void delete_user_ticket()
     {
         printf("Reclamation ID invalide!\n");
     }
-
 }
-/* Password Verification Function */
+
+/* Password Verification Function: Checks if the password meets the criteria */
 int verify_password(char pass[], char name[])
 {
     int capital = 0, mini = 0, special = 0, number = 0;
@@ -197,7 +199,7 @@ int verify_password(char pass[], char name[])
     return 0;
 }
 
-/* Login User Function */
+/* Login User Function: Authenticates a user */
 void login_user()
 {
     int user_id;
@@ -241,7 +243,7 @@ void login_user()
     }
 }
 
-/* Check Credentials Function */
+/* Check Credentials Function: Validates user credentials */
 int check_creds(int id, char pass[])
 {
     for (int i = 0; i < users_count; i++)
@@ -254,7 +256,7 @@ int check_creds(int id, char pass[])
     return 0;
 }
 
-/* Login Admin Function */
+/* Login Admin Function: Authenticates the admin */
 void login_admin()
 {
     char admin[20];
@@ -286,7 +288,7 @@ void login_admin()
     }
 }
 
-/* Admin Menu Function */
+/* Admin Menu Function: Displays the admin menu */
 void admin_menu()
 {
     int choix;
@@ -318,11 +320,10 @@ void admin_menu()
             printf("Choix Incorrect!!!\n");
             break;
         }
-    }
-    while (choix != 4);
+    } while (choix != 4);
 }
 
-/* Manage Users Function */
+/* Manage Users Function: Allows admin to manage users */
 void manage_users()
 {
     int choix;
@@ -392,11 +393,10 @@ void manage_users()
             printf("Choix Incorrect!!!\n");
             break;
         }
-    }
-    while (choix != 4);
+    } while (choix != 4);
 }
 
-/* User Menu Function */
+/* User Menu Function: Displays the user menu */
 void user_menu(int user_id)
 {
     int choix;
@@ -431,11 +431,10 @@ void user_menu(int user_id)
             printf("Choix Incorrect!!!\n");
             break;
         }
-    }
-    while (choix != 5);
+    } while (choix != 5);
 }
 
-/* Moderator Menu */
+/* Moderator Menu: Displays the moderator menu */
 void moderator_menu()
 {
     int choix;
@@ -463,12 +462,12 @@ void moderator_menu()
             printf("Choix Incorrect!!!\n");
             break;
         }
-    }
-    while (choix != 3);
+    } while (choix != 3);
 }
 
-/* Manage Tickets Moderator*/
-void manage_tickets_mod(){
+/* Manage Tickets Moderator: Allows moderator to manage tickets */
+void manage_tickets_mod()
+{
     int choix;
     do
     {
@@ -508,11 +507,10 @@ void manage_tickets_mod(){
             printf("Choix Incorrect!!!\n");
             break;
         }
-    }
-    while (choix != 4);
+    } while (choix != 4);
 }
 
-/* Menu Function */
+/* Menu Function: Displays the main menu */
 void menu()
 {
     int choix;
@@ -544,10 +542,10 @@ void menu()
             printf("Choix Incorrect!!!\n");
             break;
         }
-    }
-    while (choix != 4);
+    } while (choix != 4);
 }
 
+/* Main Function: Entry point of the program */
 int main()
 {
     menu();
