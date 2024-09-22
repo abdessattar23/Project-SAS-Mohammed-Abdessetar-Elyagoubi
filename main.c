@@ -21,13 +21,14 @@ struct Tickets
     char description[120];
     char categorie[20];
     int status;
-    int id;
+    int id; // Unique id for each ticket
     int owner_id;
     time_t date;
 } tickets[MAX_USERS * 10]; // MAX_USERS * 10 to let each user have 10 tickets.
 
 int users_count = 0;
 int tickets_count = 0;
+int id_counter = 1; // To generate unique ids
 char admin_user[] = "admin";
 char admin_passwd[] = "admin";
 int tentative_admin = 0;
@@ -39,27 +40,24 @@ void login_admin();
 void manage_users();
 void user_menu(int users_id);
 void create(int user_id);
-void modify_u(); // modify a ticket as a client not admin
+void modify_u();
 void modify_m();
 void display_user_tickets(int user_id);
 void delete_user_ticket(int user_id);
 void delete_mod_ticket();
-void admin_menu(); // Not completed
+void admin_menu();
 int check_creds(int id, char pass[]);
 int verify_password(char pass[], char name[]);
 void moderator_menu();
 void manage_tickets_mod();
-
-void modify_m();
-void menu();
-void searchbyCID(int target_id);
-void searchbyStatus(int stat);
-
 void searchbyID(int target_id);
+void searchbyStatus(int stat);
 void searchbyCat(char cat[]);
 void searchbyDate(char date[]);
 void process();
 void process_tickets();
+
+
 
 void searchbyDate(char date[])
 {
@@ -149,7 +147,7 @@ void searchbyStatus(int stat)
         }
     }
 }
-/* Password Verification Function: Checks if the password meets the criteria */
+/* Password Verification Function */
 int verify_password(char pass[], char name[])
 {
     int capital = 0, mini = 0, special = 0, number = 0;
@@ -184,7 +182,7 @@ int verify_password(char pass[], char name[])
     return 0;
 }
 
-/* Signup Function: Registers a new user */
+
 void signup()
 {
     printf("Entrer Votre nom complet: ");
@@ -204,7 +202,7 @@ void signup()
     printf("Entrer votre numero de telephone: ");
     scanf("%d", &users[users_count].phone);
     getchar();
-    users[users_count].id = users_count + 1; // Use users_count as ID
+    users[users_count].id = users_count + 1; // Use users_count as id
     users[users_count].tentative = 0;
     users[users_count].role = 0;
     printf("Votre Nouveau profile est: \n");
@@ -261,7 +259,7 @@ void search() {
         }
     } while (choix != 6);
 };
-/* Check Credentials Function: Validates user credentials */
+/* Check Credentials Function */
 int check_creds(int id, char pass[])
 {
     for (int i = 0; i < users_count; i++)
@@ -274,7 +272,7 @@ int check_creds(int id, char pass[])
     return 0;
 }
 
-/* Login User Function: Authenticates a user */
+/* Login User Function */
 void login_user()
 {
     int user_id;
@@ -318,7 +316,7 @@ void login_user()
     }
 }
 
-/* User Menu Function: Displays the user menu */
+/* User Menu Function */
 void user_menu(int user_id)
 {
     int choix;
@@ -354,104 +352,6 @@ void user_menu(int user_id)
             break;
         }
     } while (choix != 5);
-}
-
-/* Create Ticket: Allows a user to create a new ticket */
-void create(int user_id)
-{
-    time_t getnow;
-    printf("Entrer le motif: ");
-    fgets(tickets[tickets_count].motif, 50, stdin);
-    tickets[tickets_count].motif[strcspn(tickets[tickets_count].motif, "\n")] = '\0';
-    printf("Entrer la description: ");
-    fgets(tickets[tickets_count].description, 120, stdin);
-    tickets[tickets_count].description[strcspn(tickets[tickets_count].description, "\n")] = '\0';
-    printf("Entrer la categorie: ");
-    fgets(tickets[tickets_count].categorie, 20, stdin);
-    tickets[tickets_count].categorie[strcspn(tickets[tickets_count].categorie, "\n")] = '\0';
-    tickets[tickets_count].status = 0; // 0 pending; 1: en cours; 2: resolu; 3: fermee
-    tickets[tickets_count].owner_id = user_id;
-    tickets[tickets_count].id = tickets_count + 1;
-    getnow = time(NULL);
-    tickets[tickets_count].date = getnow;
-    printf("La reclamation a ete enregistree avec succes!\n");
-    printf("Reclamation Identifiant: %d\nOwner: %d\n", tickets[tickets_count].id, tickets[tickets_count].owner_id);
-    tickets_count++;
-}
-
-/* Modify a Ticket as a Client */
-void modify_u()
-{
-    int entred_ticket_id;
-    time_t newt;
-    printf("Entrer l'identifiant de la reclamation a modifier: ");
-    scanf("%d", &entred_ticket_id);
-    getchar();
-    newt = time(NULL);
-    double diff = difftime(newt, tickets[entred_ticket_id - 1].date);
-    if (diff > 10)
-    {
-        printf("La reclamation a depassee le temps necessaire pour la modification\n");
-        return;
-    }
-
-    printf("Entrer le nouveau motif: ");
-    fgets(tickets[entred_ticket_id - 1].motif, 50, stdin);
-    printf("Entrer la nouvelle description: ");
-    fgets(tickets[entred_ticket_id - 1].description, 120, stdin);
-    printf("Entrer la nouvelle categorie: ");
-    fgets(tickets[entred_ticket_id - 1].categorie, 20, stdin);
-    printf("La reclamation a modifiee avec succes!\n");
-}
-
-/* Delete User Ticket: Deletes a specific ticket */
-void delete_user_ticket(int user_id)
-{
-    time_t newt;
-    int target_id;
-    printf("Entrer l'identifiant du reclamation a supprimer: ");
-    scanf("%d", &target_id);
-    getchar();
-
-    if (target_id <= tickets_count)
-    {
-        if (user_id == tickets[target_id].owner_id)
-        {
-            for (int i = 0; i < tickets_count - 1; i++)
-            {
-                tickets[i] = tickets[i + 1];
-                tickets[i].id -= 1;
-            }
-            tickets_count--;
-            printf("Reclamation supprime avec succes!\n");
-            return;
-        }
-        else
-        {
-            printf("Vous n'avez pas le droit de supprimer cette reclamation! Car owner is : %d\n", tickets[target_id].owner_id);
-            return;
-        }
-    }
-    else
-    {
-        printf("Reclamation ID invalide!\n");
-    }
-}
-
-/* Display all User tickets: Shows all tickets for a specific user */
-void display_user_tickets(int user_id)
-{
-    for (int i = 0; i < tickets_count; i++)
-    {
-        if (tickets[i].owner_id == user_id)
-        {
-            char date[20];
-            strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
-            printf("==============Reclamation %d==============\n", i);
-            printf("Identifiant: %d\nMotif: %s\nDescription: %s\nCategorie: %s\nStatus: %d\nDate: %s\n", tickets[i].id, tickets[i].motif, tickets[i].description, tickets[i].categorie, tickets[i].status, date);
-            printf("==========================================\n");
-        }
-    }
 }
 void process()
 {
@@ -502,8 +402,6 @@ void process_tickets()
         }
     } while (choix != 3);
 }
-
-/* Moderator Menu: Displays the moderator menu */
 void moderator_menu()
 {
     int choix;
@@ -550,7 +448,6 @@ void modify_m()
     fgets(tickets[entred_ticket_id - 1].categorie, 20, stdin);
     printf("La reclamation a modifiee avec succes!\n");
 }
-/* Manage Tickets Moderator: Allows moderator to manage tickets */
 void manage_tickets_mod()
 {
     int choix;
@@ -562,6 +459,56 @@ void manage_tickets_mod()
         printf("[3] Supprimer une Reclamations\n");
         printf("[4] Rechercher une Reclamation\n");
         printf("[5]  Retour\n");
+        printf("==================================\n");
+        printf("Entrer Votre choix: ");
+        scanf("%d", &choix);
+        getchar();
+        switch (choix)
+        {
+        case 1:
+            for (int i = 0; i < tickets_count; i++)
+            {
+                char date[20];
+                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+                printf("===========Reclamation %d================\n", i);
+                printf("Identifiant: %d\n", tickets[i].id);
+                printf("Motif: %s\n", tickets[i].motif);
+                printf("Description: %s\n", tickets[i].description);
+                printf("Categorie: %s\n", tickets[i].categorie);
+                printf("Status: %d\n", tickets[i].status);
+                printf("Date: %s\n", date);
+                printf("Owner ID: %d\n", tickets[i].owner_id);
+                printf("=========================================\n");
+            }
+            break;
+        case 2:
+            modify_m();
+            break;
+        case 3:
+            delete_mod_ticket();
+            break;
+        case 4:
+            search();
+        case 5:
+            break;
+        default:
+            printf("Choix Incorrect!!!\n");
+            break;
+        }
+    } while (choix != 5);
+}
+
+void manage_tickets_admn()
+{
+    int choix;
+    do
+    {
+        printf("===============MENU===============\n");
+        printf("[1] Afficher les Reclamations\n");
+        printf("[2] Modifier une Reclamations\n");
+        printf("[3] Supprimer une Reclamations\n");
+        printf("[4] Rechercher une Reclamation\n");
+        printf("[5] Retour\n");
         printf("==================================\n");
         printf("Entrer Votre choix: ");
         scanf("%d", &choix);
@@ -623,7 +570,7 @@ void delete_mod_ticket()
     }
 }
 
-/* Login Admin Function: Authenticates the admin */
+/* Login Admin Function */
 void login_admin()
 {
     char admin[20];
@@ -655,7 +602,7 @@ void login_admin()
     }
 }
 
-/* Admin Menu Function: Displays the admin menu */
+/* Admin Menu Function */
 void admin_menu()
 {
     int choix;
@@ -676,7 +623,7 @@ void admin_menu()
             manage_users();
             break;
         case 2:
-            login_user(); // Manage Tickets as Admin
+            manage_tickets_admn(); // Manage Tickets as Admin
             break;
         case 3:
             login_admin(); // Generate Statistics
@@ -690,7 +637,7 @@ void admin_menu()
     } while (choix != 4);
 }
 
-/* Manage Users Function: Allows admin to manage users */
+/* Manage Users Function  */
 void manage_users()
 {
     int choix;
@@ -763,7 +710,7 @@ void manage_users()
     } while (choix != 4);
 }
 
-/* Menu Function: Displays the main menu */
+/* Menu Function */
 void menu()
 {
     int choix;
@@ -798,7 +745,100 @@ void menu()
     } while (choix != 4);
 }
 
-/* Main Function: Entry point of the program */
+
+
+/* Create Ticket */
+void create(int user_id)
+{
+    time_t getnow;
+    printf("Entrer le motif: ");
+    fgets(tickets[tickets_count].motif, 50, stdin);
+    tickets[tickets_count].motif[strcspn(tickets[tickets_count].motif, "\n")] = '\0';
+    printf("Entrer la description: ");
+    fgets(tickets[tickets_count].description, 120, stdin);
+    tickets[tickets_count].description[strcspn(tickets[tickets_count].description, "\n")] = '\0';
+    printf("Entrer la categorie: ");
+    fgets(tickets[tickets_count].categorie, 20, stdin);
+    tickets[tickets_count].categorie[strcspn(tickets[tickets_count].categorie, "\n")] = '\0';
+    tickets[tickets_count].status = 0; // 0: en cours; 2: resolu; 3: fermee
+    tickets[tickets_count].owner_id = user_id;
+    tickets[tickets_count].id = id_counter++; // Assign unique id
+    getnow = time(NULL);
+    tickets[tickets_count].date = getnow;
+    printf("La reclamation a ete enregistree avec succes!\n");
+    printf("Reclamation Identifiant: %d\nOwner: %d\n", tickets[tickets_count].id, tickets[tickets_count].owner_id);
+    tickets_count++;
+}
+
+/* Delete User Ticket */
+void delete_user_ticket(int user_id)
+{
+    int target_id;
+    printf("Entrer l'identifiant du reclamation a supprimer: ");
+    scanf("%d", &target_id);
+    getchar();
+
+    for (int i = 0; i < tickets_count; i++)
+    {
+        if (tickets[i].id == target_id && tickets[i].owner_id == user_id)
+        {
+            tickets[i].id = -1; // Mark as deleted
+            printf("Reclamation supprime avec succes!\n");
+            return;
+        }
+    }
+    printf("Reclamation ID invalide ou vous n'avez pas le droit de supprimer cette reclamation!\n");
+}
+
+/* Display all User ticket */
+void display_user_tickets(int user_id)
+{
+    for (int i = 0; i < tickets_count; i++)
+    {
+        if (tickets[i].owner_id == user_id && tickets[i].id != -1) // Skip deleted tickets
+        {
+            char date[20];
+            strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+            printf("==============Reclamation %d==============\n", tickets[i].id);
+            printf("Identifiant: %d\nMotif: %s\nDescription: %s\nCategorie: %s\nStatus: %d\nDate: %s\n", tickets[i].id, tickets[i].motif, tickets[i].description, tickets[i].categorie, tickets[i].status, date);
+            printf("==========================================\n");
+        }
+    }
+}
+
+/* Modify a Ticket as a Client */
+void modify_u()
+{
+    int entred_ticket_id;
+    printf("Entrer l'identifiant de la reclamation a modifier: ");
+    scanf("%d", &entred_ticket_id);
+    getchar();
+
+    for (int i = 0; i < tickets_count; i++)
+    {
+        if (tickets[i].id == entred_ticket_id && tickets[i].id != -1)
+        {
+            time_t newt = time(NULL);
+            double diff = difftime(newt, tickets[i].date);
+            if (diff > 10)
+            {
+                printf("La reclamation a depassee le temps necessaire pour la modification\n");
+                return;
+            }
+
+            printf("Entrer le nouveau motif: ");
+            fgets(tickets[i].motif, 50, stdin);
+            printf("Entrer la nouvelle description: ");
+            fgets(tickets[i].description, 120, stdin);
+            printf("Entrer la nouvelle categorie: ");
+            fgets(tickets[i].categorie, 20, stdin);
+            printf("La reclamation a modifiee avec succes!\n");
+            return;
+        }
+    }
+    printf("Reclamation ID invalide ou introuvable!\n");
+}
+
 int main()
 {
     menu();
