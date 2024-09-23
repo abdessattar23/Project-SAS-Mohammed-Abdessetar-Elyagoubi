@@ -5,11 +5,6 @@
 #define MAX_USERS 100
 #include <ctype.h>
 
-void to_lowercase(char *str) {
-    for (int i = 0; str[i]; i++) {
-        str[i] = tolower(str[i]);
-    }
-}
 
 /* Global Declarations */
 struct Users
@@ -19,6 +14,7 @@ struct Users
     int id;
     int phone;
     int tentative;
+    time_t last_attemp;
     int role;
 } users[MAX_USERS];
 
@@ -41,6 +37,7 @@ int id_counter = 1; // To generate unique ids
 char admin_user[] = "admin";
 char admin_passwd[] = "admin";
 int tentative_admin = 0;
+time_t attemp_admin = 0;
 
 /* Function Prototypes */
 void signup();
@@ -65,16 +62,15 @@ void searchbyCat(char cat[]);
 void searchbyDate(char date[]);
 void process();
 void process_tickets();
-int priority(int id, char desc[]);
+int prior(char desc[]);
 
 
-int priority(int id, char desc[]) {
-    //char priority[10];
+int prior(char desc[]) {
     char *occurrence;
     char *occ;
     char urgent[][7] = {"urgent", "billing", "panne", "urgence"};
     char moyenne[][13] = {"tros", "wifi", "possible"};
-    int ur =0, moy=0; //bas=0;
+    int ur =0, moy=0;
     
     for(int i = 0; i < 2; i++) {
         occ = strstr(desc, moyenne[i]);
@@ -112,7 +108,19 @@ void searchbyDate(char date[])
             printf("Motif: %s\n", tickets[i].motif);
             printf("Description: %s\n", tickets[i].description);
             printf("Categorie: %s\n", tickets[i].categorie);
-            printf("Status: %d\n", tickets[i].status);
+            printf("Status: ");
+            switch (tickets[i].status)
+            {
+            case 0:
+                printf("en cours\n");
+                break;
+            case 1:
+                printf("resolved\n");
+                break;
+            case 2:
+                printf("fermee\n");
+                break;
+            }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", date2);
             return;
@@ -130,7 +138,19 @@ void searchbyCat(char cat[])
             printf("Motif: %s\n", tickets[i].motif);
             printf("Description: %s\n", tickets[i].description);
             printf("Categorie: %s\n", tickets[i].categorie);
-            printf("Status: %d\n", tickets[i].status);
+            printf("Status: ");
+            switch (tickets[i].status)
+            {
+            case 0:
+                printf("en cours\n");
+                break;
+            case 1:
+                printf("resolved\n");
+                break;
+            case 2:
+                printf("fermee\n");
+                break;
+            }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
             return;
@@ -148,7 +168,19 @@ void searchbyID(int target_id)
             printf("Motif: %s\n", tickets[i].motif);
             printf("Description: %s\n", tickets[i].description);
             printf("Categorie: %s\n", tickets[i].categorie);
-            printf("Status: %d\n", tickets[i].status);
+            printf("Status: ");
+            switch (tickets[i].status)
+            {
+            case 0:
+                printf("en cours\n");
+                break;
+            case 1:
+                printf("resolved\n");
+                break;
+            case 2:
+                printf("fermee\n");
+                break;
+            }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
             printf("Priority: %d\n", tickets[i].priority);
@@ -166,7 +198,19 @@ void searchbyCID(int target_id)
             printf("Motif: %s\n", tickets[i].motif);
             printf("Description: %s\n", tickets[i].description);
             printf("Categorie: %s\n", tickets[i].categorie);
-            printf("Status: %d\n", tickets[i].status);
+            printf("Status: ");
+            switch (tickets[i].status)
+            {
+            case 0:
+                printf("en cours\n");
+                break;
+            case 1:
+                printf("resolved\n");
+                break;
+            case 2:
+                printf("fermee\n");
+                break;
+            }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
             return;
@@ -183,7 +227,19 @@ void searchbyStatus(int stat)
             printf("Motif: %s\n", tickets[i].motif);
             printf("Description: %s\n", tickets[i].description);
             printf("Categorie: %s\n", tickets[i].categorie);
-            printf("Status: %d\n", tickets[i].status);
+            printf("Status: ");
+            switch (tickets[i].status)
+            {
+            case 0:
+                printf("en cours\n");
+                break;
+            case 1:
+                printf("resolved\n");
+                break;
+            case 2:
+                printf("fermee\n");
+                break;
+            }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
             return;
@@ -201,7 +257,7 @@ int verify_password(char pass[], char name[])
     }
     if (strlen(pass) >= 8)
     {
-        for (int i = 0; i < strlen(pass); i++)
+        for (int i = 0; i < (int)strlen(pass); i++)
         {
             if (pass[i] >= 65 && pass[i] <= 90)
             {
@@ -294,6 +350,7 @@ void search() {
             searchbyCID(c_id);
         case 5:
             printf("Entrer le status a rechercher: 0 pour en cours 1 pour Resolu 2 pour Fermee: ");
+            scanf("%d", &stat);
             searchbyStatus(stat);
             break;
         default:
@@ -301,7 +358,7 @@ void search() {
             break;
         }
     } while (choix != 6);
-};
+}
 /* Check Credentials Function */
 int check_creds(int id, char pass[])
 {
@@ -326,6 +383,13 @@ void login_user()
     printf("Entrer votre mot de pass: ");
     fgets(user_pass, 20, stdin);
     user_pass[strcspn(user_pass, "\n")] = '\0';
+    if (users[user_id].tentative >= 3 &&  difftime(time(NULL), users[user_id].last_attemp) < 30)
+
+        {
+            printf("Vous avez depasse le nombre de tentative !\n");
+            printf("Vous devez attendre 24h avant de ressayer !\n");
+            return;
+        }
 
     int cred_check = check_creds(user_id, user_pass);
     if (cred_check == 1)
@@ -343,7 +407,10 @@ void login_user()
     {
         printf("Mot de pass Incorrect\n");
         users[user_id].tentative++;
-        if (users[user_id].tentative >= 3)
+        if(users[user_id].tentative >= 3 && users[user_id].last_attemp == 0)
+            time(&users[user_id].last_attemp);
+        if (users[user_id].tentative >= 3 &&  difftime(time(NULL), users[user_id].last_attemp) < 30)
+
         {
             printf("Vous avez depasse le nombre de tentative !\n");
             printf("Vous devez attendre 24h avant de ressayer !\n");
@@ -402,29 +469,20 @@ void process() {
     printf("Entrer l'ID de la reclamation: ");
     scanf("%d", &target_id);
     getchar();
-
-    // Adjusting for zero-based index
     if (target_id < 1 || target_id > tickets_count) {
         printf("Identifiant Invalide\n");
         return;
     }
-
-    // Convert to zero-based index
     target_id -= 1;
-
     int stat;
     printf("Entrer le Status: 1 pour en cours; 2 pour Resolu; 3 pour Fermee: ");
     scanf("%d", &stat);
     getchar();
-
-    // Change the status
     tickets[target_id].status = stat;
-
-    // Update timetoberesolved if defined in the struct
     time_t t = time(NULL);
     tickets[target_id].timetoberesolved = difftime(t, tickets[target_id].date);
 
-    printf("Reclamation Id: %d a ete modifie avec succes.\n", target_id + 1);  // Adjust back for display
+    printf("Reclamation Id: %d a ete modifie avec succes.\n", target_id + 1);
 }
 
 /* Process Tickets As a Mod */
@@ -518,7 +576,6 @@ void manage_tickets_mod()
         printf("Entrer Votre choix: ");
         scanf("%d", &choix);
         getchar();
-        int order[tickets_count];
         switch (choix)
         {
         case 1:
@@ -533,10 +590,34 @@ void manage_tickets_mod()
                 printf("Motif: %s\n", tickets[i].motif);
                 printf("Description: %s\n", tickets[i].description);
                 printf("Categorie: %s\n", tickets[i].categorie);
-                printf("Status: %d\n", tickets[i].status);
+                printf("Status: ");
+                switch (tickets[i].status)
+                {
+                    case 0:
+                        printf("en cours\n");
+                        break;
+                    case 1:
+                        printf("resolved\n");
+                        break;
+                    case 2:
+                        printf("fermee\n");
+                        break;
+                }
                 printf("Date: %s\n", date);
                 printf("Owner ID: %d\n", tickets[i].owner_id);
-                printf("Priority: %d\n", tickets[i].priority);
+                printf("Priority: ");
+                switch (tickets[i].priority)
+                {
+                case 0:
+                    printf("basse\n");
+                    break;
+                case 1:
+                    printf("moyenne\n");
+                    break;
+                case 2:
+                    printf("Haute\n");
+                    break;
+                }
                 printf("=========================================\n");
                 }
             }
@@ -550,10 +631,34 @@ void manage_tickets_mod()
                 printf("Motif: %s\n", tickets[i].motif);
                 printf("Description: %s\n", tickets[i].description);
                 printf("Categorie: %s\n", tickets[i].categorie);
-                printf("Status: %d\n", tickets[i].status);
+                printf("Status: ");
+                switch (tickets[i].status)
+                {
+                    case 0:
+                        printf("en cours\n");
+                        break;
+                    case 1:
+                        printf("resolved\n");
+                        break;
+                    case 2:
+                        printf("fermee\n");
+                        break;
+                }
                 printf("Date: %s\n", date);
                 printf("Owner ID: %d\n", tickets[i].owner_id);
-                printf("Priority: %d\n", tickets[i].priority);
+                printf("Priority: ");
+                switch (tickets[i].priority)
+                {
+                case 0:
+                    printf("basse\n");
+                    break;
+                case 1:
+                    printf("moyenne\n");
+                    break;
+                case 2:
+                    printf("Haute\n");
+                    break;
+                }
                 printf("=========================================\n");
                 }
             }
@@ -567,10 +672,34 @@ void manage_tickets_mod()
                 printf("Motif: %s\n", tickets[i].motif);
                 printf("Description: %s\n", tickets[i].description);
                 printf("Categorie: %s\n", tickets[i].categorie);
-                printf("Status: %d\n", tickets[i].status);
+                printf("Status: ");
+                switch (tickets[i].status)
+                {
+                    case 0:
+                        printf("en cours\n");
+                        break;
+                    case 1:
+                        printf("resolved\n");
+                        break;
+                    case 2:
+                        printf("fermee\n");
+                        break;
+                }
                 printf("Date: %s\n", date);
                 printf("Owner ID: %d\n", tickets[i].owner_id);
-                printf("Priority: %d\n", tickets[i].priority);
+                printf("Status: ");
+            switch (tickets[i].status)
+            {
+            case 0:
+                printf("en cours\n");
+                break;
+            case 1:
+                printf("resolved\n");
+                break;
+            case 2:
+                printf("fermee\n");
+                break;
+            }
                 printf("=========================================\n");
                 }
             }
@@ -595,7 +724,6 @@ void manage_tickets_mod()
 
 void delete_mod_ticket()
 {
-    time_t newt;
     int target_id;
     printf("Entrer l'identifiant du reclamation a supprimer: ");
     scanf("%d", &target_id);
@@ -627,8 +755,16 @@ void login_admin()
     printf("Entrer votre mot de passe : ");
     fgets(admin_pass, 20, stdin);
     admin_pass[strcspn(admin_pass, "\n")] = '\0';
+        if(tentative_admin >= 3)
+           time(&attemp_admin);
+        if (tentative_admin >= 3 &&  difftime(time(NULL), attemp_admin) < 30)
 
-    if ((3 - tentative_admin) <= 0)
+        {
+            printf("Vous avez depasse le nombre de tentative !\n");
+            printf("Vous devez attendre 24h avant de ressayer !\n");
+            return;
+        }
+    if ((3 - tentative_admin) <= 1)
     {
         printf("Vous avez depasse le nombre de tentative !\n");
         printf("Vous devez attendre 24h avant de ressayer !\n");
@@ -849,7 +985,7 @@ void create(int user_id)
     getnow = time(NULL);
     tickets[tickets_count].date = getnow;
     tickets[tickets_count].priority = 0;
-    int pr = priority(tickets[tickets_count].id, tickets[tickets_count].description);
+    int pr = prior(tickets[tickets_count].description);
     tickets[tickets_count].priority = pr;
     printf("set ticket priority to '%d'\n", tickets[tickets[tickets_count].id].priority);
     printf("La reclamation a ete enregistree avec succes!\n");
