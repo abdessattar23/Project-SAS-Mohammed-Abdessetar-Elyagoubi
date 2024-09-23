@@ -3,6 +3,13 @@
 #include <string.h>
 #include <time.h>
 #define MAX_USERS 100
+#include <ctype.h>
+
+void to_lowercase(char *str) {
+    for (int i = 0; str[i]; i++) {
+        str[i] = tolower(str[i]);
+    }
+}
 
 /* Global Declarations */
 struct Users
@@ -24,6 +31,8 @@ struct Tickets
     int id; // Unique id for each ticket
     int owner_id;
     time_t date;
+    int timetoberesolved;
+    int priority;
 } tickets[MAX_USERS * 10]; // MAX_USERS * 10 to let each user have 10 tickets.
 
 int users_count = 0;
@@ -56,8 +65,40 @@ void searchbyCat(char cat[]);
 void searchbyDate(char date[]);
 void process();
 void process_tickets();
+int priority(int id, char desc[]);
 
 
+int priority(int id, char desc[]) {
+    //char priority[10];
+    char *occurrence;
+    char *occ;
+    char urgent[][7] = {"urgent", "billing", "panne", "urgence"};
+    char moyenne[][13] = {"tros", "wifi", "possible"};
+    int ur =0, moy=0; //bas=0;
+    
+    for(int i = 0; i < 2; i++) {
+        occ = strstr(desc, moyenne[i]);
+        while (occ != NULL) {
+            moy++;
+            occ = strstr(occ + strlen(moyenne[i]), moyenne[i]);
+        }
+    }
+    for(int i = 0; i < 3; i++) {
+        occurrence = strstr(desc, urgent[i]);
+        while (occurrence != NULL) {
+            ur++;
+            occurrence = strstr(occurrence + strlen(urgent[i]), urgent[i]);
+        }
+    }
+    if(ur != 0 && ur > moy){
+        return 2;
+    }else if(moy != 0 && moy > ur){
+        return 1;
+    }else{
+        return 0;
+    }
+
+}
 
 void searchbyDate(char date[])
 {
@@ -100,6 +141,7 @@ void searchbyID(int target_id)
 {
     for (int i = 0; i < tickets_count; i++)
     {
+
         if (tickets[i].id == target_id)
         {
             printf("Identifiant: %d\n", tickets[i].id);
@@ -109,6 +151,7 @@ void searchbyID(int target_id)
             printf("Status: %d\n", tickets[i].status);
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
+            printf("Priority: %d\n", tickets[i].priority);
             return;
         }
     }
@@ -353,25 +396,37 @@ void user_menu(int user_id)
         }
     } while (choix != 5);
 }
-void process()
-{
+void process() {
     int target_id;
-    printf("Entrer l'ID du reclamation: ");
+
+    printf("Entrer l'ID de la reclamation: ");
     scanf("%d", &target_id);
     getchar();
-    if (target_id <= tickets_count)
-    {
-        int stat;
-        printf("Entrer le Status: 1 pour en cours; 2 pour Resolu; 3 pour Fermee");
-        scanf("%d", &stat);
-        getchar();
-        tickets[target_id].status = stat;
-        printf("Reclamation Id: %d a ete modifier avec success.\n", target_id);
-        return;
-    }else{
+
+    // Adjusting for zero-based index
+    if (target_id < 1 || target_id > tickets_count) {
         printf("Identifiant Invalide\n");
+        return;
     }
+
+    // Convert to zero-based index
+    target_id -= 1;
+
+    int stat;
+    printf("Entrer le Status: 1 pour en cours; 2 pour Resolu; 3 pour Fermee: ");
+    scanf("%d", &stat);
+    getchar();
+
+    // Change the status
+    tickets[target_id].status = stat;
+
+    // Update timetoberesolved if defined in the struct
+    time_t t = time(NULL);
+    tickets[target_id].timetoberesolved = difftime(t, tickets[target_id].date);
+
+    printf("Reclamation Id: %d a ete modifie avec succes.\n", target_id + 1);  // Adjust back for display
 }
+
 /* Process Tickets As a Mod */
 void process_tickets()
 {
@@ -463,12 +518,15 @@ void manage_tickets_mod()
         printf("Entrer Votre choix: ");
         scanf("%d", &choix);
         getchar();
+        int order[tickets_count];
         switch (choix)
         {
         case 1:
+            
             for (int i = 0; i < tickets_count; i++)
             {
-                char date[20];
+                if(tickets[i].priority == 2){
+                    char date[20];
                 strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
                 printf("===========Reclamation %d================\n", i);
                 printf("Identifiant: %d\n", tickets[i].id);
@@ -478,7 +536,43 @@ void manage_tickets_mod()
                 printf("Status: %d\n", tickets[i].status);
                 printf("Date: %s\n", date);
                 printf("Owner ID: %d\n", tickets[i].owner_id);
+                printf("Priority: %d\n", tickets[i].priority);
                 printf("=========================================\n");
+                }
+            }
+            for (int i = 0; i < tickets_count; i++)
+            {
+                if(tickets[i].priority == 1){
+                    char date[20];
+                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+                printf("===========Reclamation %d================\n", i);
+                printf("Identifiant: %d\n", tickets[i].id);
+                printf("Motif: %s\n", tickets[i].motif);
+                printf("Description: %s\n", tickets[i].description);
+                printf("Categorie: %s\n", tickets[i].categorie);
+                printf("Status: %d\n", tickets[i].status);
+                printf("Date: %s\n", date);
+                printf("Owner ID: %d\n", tickets[i].owner_id);
+                printf("Priority: %d\n", tickets[i].priority);
+                printf("=========================================\n");
+                }
+            }
+            for (int i = 0; i < tickets_count; i++)
+            {
+                if(tickets[i].priority == 0){
+                    char date[20];
+                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+                printf("===========Reclamation %d================\n", i);
+                printf("Identifiant: %d\n", tickets[i].id);
+                printf("Motif: %s\n", tickets[i].motif);
+                printf("Description: %s\n", tickets[i].description);
+                printf("Categorie: %s\n", tickets[i].categorie);
+                printf("Status: %d\n", tickets[i].status);
+                printf("Date: %s\n", date);
+                printf("Owner ID: %d\n", tickets[i].owner_id);
+                printf("Priority: %d\n", tickets[i].priority);
+                printf("=========================================\n");
+                }
             }
             break;
         case 2:
@@ -498,55 +592,7 @@ void manage_tickets_mod()
     } while (choix != 5);
 }
 
-void manage_tickets_admn()
-{
-    int choix;
-    do
-    {
-        printf("===============MENU===============\n");
-        printf("[1] Afficher les Reclamations\n");
-        printf("[2] Modifier une Reclamations\n");
-        printf("[3] Supprimer une Reclamations\n");
-        printf("[4] Rechercher une Reclamation\n");
-        printf("[5] Retour\n");
-        printf("==================================\n");
-        printf("Entrer Votre choix: ");
-        scanf("%d", &choix);
-        getchar();
-        switch (choix)
-        {
-        case 1:
-            for (int i = 0; i < tickets_count; i++)
-            {
-                char date[20];
-                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
-                printf("===========Reclamation %d================\n", i);
-                printf("Identifiant: %d\n", tickets[i].id);
-                printf("Motif: %s\n", tickets[i].motif);
-                printf("Description: %s\n", tickets[i].description);
-                printf("Categorie: %s\n", tickets[i].categorie);
-                printf("Status: %d\n", tickets[i].status);
-                printf("Date: %s\n", date);
-                printf("Owner ID: %d\n", tickets[i].owner_id);
-                printf("=========================================\n");
-            }
-            break;
-        case 2:
-            modify_m();
-            break;
-        case 3:
-            delete_mod_ticket();
-            break;
-        case 4:
-            search();
-        case 5:
-            break;
-        default:
-            printf("Choix Incorrect!!!\n");
-            break;
-        }
-    } while (choix != 5);
-}
+
 void delete_mod_ticket()
 {
     time_t newt;
@@ -601,7 +647,45 @@ void login_admin()
         login_admin();
     }
 }
+void rapport(){
+    int resolved=0, tot=0;
+    printf("Le total reclamation cree est: %d\n", tickets_count);
+    for(int i = 0; i < tickets_count; i++){
+        if(tickets[i].status == 2){
+            resolved++;
+            tot += tickets[i].timetoberesolved;
+        }
+        
+    }
+    if(resolved != 0){
+        printf("No ticket got resolved\n");
+        return;
+    }
+    printf("Le total reclamation resolue est: %d\n", resolved);
+    printf("Le Resolution Rate est: %.2f%%\n", ((float)(resolved/tickets_count))*100);
+    printf("Le temps moyenne pour traiter les reclamations est: %d\n", tot/resolved);
+    char infile[1000] = "===========Le journal pour Ce jour===========\n";
+    strcat(infile, "\n\nLes Reclamations de ce jours sont:\n");
+    for(int i=0;i<tickets_count;i++){
+        char rec[300];
+        sprintf(rec, "Identifiant: %d\nMotif: %s\nDescription: %s\nCategorie: %s\nStatus: %d\nDate: %s\nOwner ID: %d\nPriority: %d\n", tickets[i].id, tickets[i].motif, tickets[i].description, tickets[i].categorie, tickets[i].status, ctime(&tickets[i].date), tickets[i].owner_id, tickets[i].priority);
+        strcat(infile, rec);
+    }
+    strcat(infile, "\n\nLe nombre des reclamations resolue est: ");
+    char buff[8];
+    itoa(resolved, buff, 10);
+    strcat(infile, buff);
+    strcat(infile, "\n\nLe nombre totals des reclamations est: ");
+    itoa(tickets_count, buff, 10);
+    strcat(infile, buff);
+    strcat(infile, "\n=======================================");
 
+
+    FILE *fptr;
+    fptr = fopen("rapport de jour.txt", "w");
+    fprintf(fptr, infile);
+    fclose(fptr);
+}
 /* Admin Menu Function */
 void admin_menu()
 {
@@ -609,10 +693,10 @@ void admin_menu()
     do
     {
         printf("===============MENU===============\n");
-        printf("[1] Gestion des utilisateurs\n");
-        printf("[2] Gestion des Reclamations\n");
-        printf("[3] Gestion des statistiques\n");
-        printf("[4] Retour\n");
+        printf("[1] Gestion des Reclamations\n");
+        printf("[2] Traitement des Reclamations\n");
+        printf("[3] Generer un rapport\n");
+        printf("[3] Retour\n");
         printf("==================================\n");
         printf("Entrer Votre choix: ");
         scanf("%d", &choix);
@@ -620,21 +704,20 @@ void admin_menu()
         switch (choix)
         {
         case 1:
-            manage_users();
+            manage_tickets_mod();
             break;
         case 2:
-            manage_tickets_admn(); // Manage Tickets as Admin
+            process_tickets(); // Proccess Tickets as Mode
             break;
         case 3:
-            login_admin(); // Generate Statistics
-            break;
+            rapport();
         case 4:
             break;
         default:
             printf("Choix Incorrect!!!\n");
             break;
         }
-    } while (choix != 4);
+    } while (choix != 3);
 }
 
 /* Manage Users Function  */
@@ -765,6 +848,10 @@ void create(int user_id)
     tickets[tickets_count].id = id_counter++; // Assign unique id
     getnow = time(NULL);
     tickets[tickets_count].date = getnow;
+    tickets[tickets_count].priority = 0;
+    int pr = priority(tickets[tickets_count].id, tickets[tickets_count].description);
+    tickets[tickets_count].priority = pr;
+    printf("set ticket priority to '%d'\n", tickets[tickets[tickets_count].id].priority);
     printf("La reclamation a ete enregistree avec succes!\n");
     printf("Reclamation Identifiant: %d\nOwner: %d\n", tickets[tickets_count].id, tickets[tickets_count].owner_id);
     tickets_count++;
