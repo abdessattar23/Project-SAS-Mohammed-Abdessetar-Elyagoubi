@@ -45,6 +45,8 @@ void login_user();
 void login_admin();
 void manage_users();
 void user_menu(int users_id);
+int check_creds(int id, char pass[]);
+int verify_password(char pass[], char name[]);
 void create(int user_id);
 void modify_u();
 void modify_m();
@@ -52,14 +54,16 @@ void display_user_tickets(int user_id);
 void delete_user_ticket(int user_id);
 void delete_mod_ticket();
 void admin_menu();
-int check_creds(int id, char pass[]);
-int verify_password(char pass[], char name[]);
 void moderator_menu();
 void manage_tickets_mod();
+void rapport();
+void menu();
+void search();
 void searchbyID(int target_id);
 void searchbyStatus(int stat);
 void searchbyCat(char cat[]);
 void searchbyDate(char date[]);
+void searchbyCID(int target_id);
 void process();
 void process_tickets();
 int prior(char desc[]);
@@ -97,6 +101,7 @@ int prior(char desc[]) {
 }
 
 void searchbyDate(char date[]) {
+    system("@cls||clear");
     printf("\n************************************************************\n");
     printf("               *** TICKET SEARCH RESULTS ***                \n");
     printf("************************************************************\n");
@@ -137,6 +142,7 @@ void searchbyDate(char date[]) {
 
 void searchbyCat(char cat[])
 {
+    system("@cls||clear");
     for (int i = 0; i < tickets_count; i++)
     {
         if (strcmp(tickets[i].categorie, cat) == 0)
@@ -164,6 +170,7 @@ void searchbyCat(char cat[])
     }
 }
 void searchbyID(int target_id) {
+    system("@cls||clear");
     printf("\n************************************************************\n");
     printf("                *** TICKET SEARCH BY ID ***                 \n");
     printf("************************************************************\n");
@@ -202,6 +209,7 @@ void searchbyID(int target_id) {
 }
 
 void searchbyCID(int target_id) {
+    system("@cls||clear");
     printf("\n************************************************************\n");
     printf("                *** TICKETS SEARCH BY OWNER ID ***           \n");
     printf("************************************************************\n");
@@ -246,6 +254,7 @@ void searchbyCID(int target_id) {
 }
 
 void searchbyStatus(int stat) {
+    system("@cls||clear");
     printf("\n************************************************************\n");
     printf("                *** TICKETS SEARCH BY STATUS ***             \n");
     printf("************************************************************\n");
@@ -338,20 +347,20 @@ void signup() {
     printf("Entrer votre mot de passe: ");
     fgets(users[users_count].pass, 50, stdin);
     users[users_count].pass[strcspn(users[users_count].pass, "\n")] = '\0'; // Remove newline
-
     // Password validation
     if (!verify_password(users[users_count].pass, users[users_count].fullname)) {
+        system("@cls||clear");
         printf("\n************************************************************\n");
         printf("ERREUR: Mot de passe invalide!\n");
         printf("Le mot de passe doit contenir au minimum:\n");
-        printf("  - 8 caractères\n  - Un caractère spécial\n  - Un chiffre\n  - Une lettre majuscule\n  - Une lettre minuscule\n");
+        printf("  - 8 caracteres\n  - Un caractere special\n  - Un chiffre\n  - Une lettre majuscule\n  - Une lettre minuscule\n");
         printf("************************************************************\n\n");
         signup(); // Recursively call signup on invalid input
         return;
     }
 
     // Prompt for phone number
-    printf("Entrer votre numéro de téléphone: ");
+    printf("Entrer votre numero de telephone: ");
     scanf("%d", &users[users_count].phone);
     getchar(); // Clear the newline character left by scanf
 
@@ -359,20 +368,21 @@ void signup() {
     users[users_count].id = users_count + 1;
     users[users_count].tentative = 0;
     users[users_count].role = 0;
-
+    system("@cls||clear");
     // Display newly created profile
     printf("\n************************************************************\n");
-    printf("         *** PROFIL CRÉÉ AVEC SUCCÈS ***                    \n");
+    printf("         *** PROFIL CRee AVEC SUCCeS ***                    \n");
     printf("************************************************************\n");
     printf("[*] Identifiant         : %d\n", users[users_count].id);
     printf("[*] Nom Complet         : %s\n", users[users_count].fullname);
-    printf("[*] Numéro de Téléphone : %d\n", users[users_count].phone);
+    printf("[*] Numero de Telephone : %d\n", users[users_count].phone);
     printf("[*] Mot de Passe        : %s\n", users[users_count].pass);
     printf("************************************************************\n\n");
 
     users_count++; // Increment user count
 }
 void search() {
+    system("@cls||clear");
     int choix, target_id, c_id, stat;
     char cat[20], date[9];
 
@@ -381,7 +391,7 @@ void search() {
         printf("                        *** MENU ***                        \n");
         printf("************************************************************\n");
         printf("[1] Rechercher par ID\n");
-        printf("[2] Rechercher par Catégorie\n");
+        printf("[2] Rechercher par Categorie\n");
         printf("[3] Rechercher par Date\n");
         printf("[4] Rechercher par Client\n");
         printf("[5] Rechercher par Statut\n");
@@ -393,34 +403,34 @@ void search() {
 
         switch (choix) {
             case 1:
-                printf("\nEntrer l'identifiant de la réclamation à rechercher: ");
+                printf("\nEntrer l'identifiant de la reclamation a rechercher: ");
                 scanf("%d", &target_id);
                 searchbyID(target_id);
                 break;
 
             case 2:
-                printf("\nEntrer la catégorie à rechercher: ");
+                printf("\nEntrer la categorie a rechercher: ");
                 fgets(cat, 20, stdin);
                 cat[strcspn(cat, "\n")] = '\0'; // Remove newline
                 searchbyCat(cat);
                 break;
 
             case 3:
-                printf("\nEntrer la date à rechercher sous la forme DD/MM/YY (ex: 01/01/24): ");
+                printf("\nEntrer la date a rechercher sous la forme DD/MM/YY (ex: 01/01/24): ");
                 fgets(date, 9, stdin);
                 date[strcspn(date, "\n")] = '\0'; // Remove newline
                 searchbyDate(date);
                 break;
 
             case 4:
-                printf("\nEntrer l'identifiant du client qui a soumis la réclamation: ");
+                printf("\nEntrer l'identifiant du client qui a soumis la reclamation: ");
                 scanf("%d", &c_id);
                 getchar(); // Clear newline
                 searchbyCID(c_id);
                 break;
 
             case 5:
-                printf("\nEntrer le statut à rechercher (0 pour En Cours, 1 pour Résolu, 2 pour Fermée): ");
+                printf("\nEntrer le statut a rechercher (0 pour En Cours, 1 pour Resolu, 2 pour Fermee): ");
                 scanf("%d", &stat);
                 searchbyStatus(stat);
                 break;
@@ -430,7 +440,7 @@ void search() {
                 break;
 
             default:
-                printf("\nErreur: Choix incorrect! Veuillez entrer un numéro valide.\n");
+                printf("\nErreur: Choix incorrect! Veuillez entrer un numero valide.\n");
                 break;
         }
 
@@ -455,6 +465,7 @@ int check_creds(int id, char pass[])
 
 /* Login User Function */
 void login_user() {
+    system("@cls||clear");
     int user_id;
     char user_pass[20];
 
@@ -467,17 +478,10 @@ void login_user() {
     scanf("%d", &user_id);
     getchar(); // Clear newline after scanf
 
-    // Validate if the user exists
-    if (user_id < 0 || user_id >= users_count) {
-        printf("Identifiant n'existe pas!\n");
-        login_user();
-        return;
-    }
-
     // Check if the user is temporarily locked
     if (users[user_id].tentative >= 3 && difftime(time(NULL), users[user_id].last_attemp) < 30) {
-        printf("\nVous avez dépassé le nombre de tentatives autorisées !\n");
-        printf("Veuillez attendre 24h avant de réessayer.\n");
+        printf("\nVous avez depasse le nombre de tentatives autorisees !\n");
+        printf("Veuillez attendre 24h avant de reessayer.\n");
         return;
     }
 
@@ -509,8 +513,8 @@ void login_user() {
 
         // Lock user if too many failed attempts
         if (users[user_id].tentative >= 3 && difftime(time(NULL), users[user_id].last_attemp) < 30) {
-            printf("\nVous avez dépassé le nombre de tentatives autorisées !\n");
-            printf("Veuillez attendre 24h avant de réessayer.\n");
+            printf("\nVous avez depasse le nombre de tentatives autorisees !\n");
+            printf("Veuillez attendre 24h avant de reessayer.\n");
             return;
         }
 
@@ -525,6 +529,7 @@ void login_user() {
 }
 /* User Menu Function */
 void user_menu(int user_id) {
+    system("@cls||clear");
     int choix;
     do {
         printf("\n************************************************************\n");
@@ -567,6 +572,7 @@ void user_menu(int user_id) {
     printf("************************************************************\n");
 }
 void process() {
+    system("@cls||clear");
     int target_id;
 
     printf("\n************************************************************\n");
@@ -598,6 +604,7 @@ void process() {
 }
 /* Process Tickets As a Mod */
 void process_tickets() {
+    system("@cls||clear");
     int choix;
 
     do {
@@ -629,6 +636,7 @@ void process_tickets() {
     } while (choix != 3);
 }
 void moderator_menu() {
+    system("@cls||clear");
     int choix;
 
     do {
@@ -661,6 +669,7 @@ void moderator_menu() {
 }
 /* Modify a Ticket as a Moderator */
 void modify_m() {
+    system("@cls||clear");
     int entred_ticket_id;
 
     printf("\nEntrer l'identifiant de la reclamation a modifier: ");
@@ -679,6 +688,7 @@ void modify_m() {
     printf("\n*** La reclamation a modifiee avec succes! ***\n");
 }
 void manage_tickets_mod() {
+    system("@cls||clear");
     int choix;
 
     do {
@@ -806,6 +816,7 @@ void manage_tickets_mod() {
 }
 
 void delete_mod_ticket() {
+    system("@cls||clear");
     int target_id;
     printf("\n************************************************************\n");
     printf("              *** SUPPRIMER UNE RECLAMATION ***            \n");
@@ -829,6 +840,7 @@ void delete_mod_ticket() {
 
 /* Login Admin Function */
 void login_admin() {
+    system("@cls||clear");
     char admin[20];
     char admin_pass[20];
 
@@ -870,7 +882,9 @@ void login_admin() {
     }
 }
 void rapport() {
-    int resolved = 0, tot = 0;
+    system("@cls||clear");
+    float resolved = 0, tot = 0;
+    int res = 0, tot2 = 0;
 
     printf("\n************************************************************\n");
     printf("                     *** RAPPORT ***                        \n");
@@ -881,7 +895,9 @@ void rapport() {
     for (int i = 0; i < tickets_count; i++) {
         if (tickets[i].status == 2) {
             resolved++;
+            res++;
             tot += tickets[i].timetoberesolved;
+            tot2 += tickets[i].timetoberesolved;
         }
     }
 
@@ -890,9 +906,9 @@ void rapport() {
         return;
     }
 
-    printf("Le total reclamation resolue est: %d\n", resolved);
-    printf("Le Resolution Rate est: %.2f%%\n", ((float)(resolved) / tickets_count) * 100);
-    printf("Le temps moyenne pour traiter les reclamations est: %d\n", tot / resolved);
+    printf("Le total reclamation resolue est: %d\n", res);
+    printf("Le Resolution Rate est: %.2f%%\n", ((float)(resolved) / (float)(tickets_count)) * 100);
+    printf("Le temps moyenne pour traiter les reclamations est: %d\n", tot2 / res);
 
     char infile[1000] = "===========Le journal pour Ce jour===========\n";
     strcat(infile, "\n\nLes Reclamations de ce jours sont:\n");
@@ -932,6 +948,7 @@ void rapport() {
 }
 /* Admin Menu Function */
 void admin_menu() {
+    system("@cls||clear");
     int choix;
 
     do {
@@ -978,6 +995,7 @@ void admin_menu() {
 }
 /* Manage Users Function  */
 void manage_users() {
+    system("@cls||clear");
     int choix;
 
     do {
@@ -1048,6 +1066,7 @@ void manage_users() {
 }
 /* Menu Function */
 void menu() {
+    system("@cls||clear");
     int choix;
 
     do {
@@ -1090,6 +1109,7 @@ void menu() {
 
 /* Create Ticket */
 void create(int user_id) {
+    system("@cls||clear");
     time_t getnow;
 
     printf("\n************************************************************\n");
@@ -1130,6 +1150,7 @@ void create(int user_id) {
 }
 /* Delete User Ticket */
 void delete_user_ticket(int user_id) {
+    system("@cls||clear");
     int target_id;
     printf("\n************************************************************\n");
     printf("              *** SUPPRIMER UNE RECLAMATION ***            \n");
@@ -1161,6 +1182,7 @@ void delete_user_ticket(int user_id) {
 }
 /* Display all User ticket */
 void display_user_tickets(int user_id) {
+    system("@cls||clear");
     printf("\n************************************************************\n");
     printf("                  *** VOS RECLAMATIONS ***                 \n");
     printf("************************************************************\n");
@@ -1191,6 +1213,7 @@ void display_user_tickets(int user_id) {
 }
 /* Modify a Ticket as a Client */
 void modify_u() {
+    system("@cls||clear");
     int entred_ticket_id;
     printf("\n************************************************************\n");
     printf("                *** MODIFIER UNE RECLAMATION ***           \n");
