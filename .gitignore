@@ -4,3 +4,4 @@
 a.exe
 build/Debug/main.o
 build/Debug/outDebug.exe
+build/Debug/v2.c

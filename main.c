@@ -123,11 +123,9 @@ void searchbyDate(char date[])
             }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", date2);
-            return;
         }
     }
 }
-
 void searchbyCat(char cat[])
 {
     for (int i = 0; i < tickets_count; i++)
@@ -153,7 +151,6 @@ void searchbyCat(char cat[])
             }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
-            return;
         }
     }
 }
@@ -184,7 +181,6 @@ void searchbyID(int target_id)
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
             printf("Priority: %d\n", tickets[i].priority);
-            return;
         }
     }
 }
@@ -213,7 +209,6 @@ void searchbyCID(int target_id)
             }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
-            return;
         }
     }
 }
@@ -242,7 +237,6 @@ void searchbyStatus(int stat)
             }
             printf("Owner ID: %d\n", tickets[i].owner_id);
             printf("Date: %s\n", ctime(&tickets[i].date));
-            return;
         }
     }
 }
@@ -338,7 +332,7 @@ void search() {
             searchbyCat(cat);
             break;
         case 3:
-            printf("Entrer la date a rechercher sous forme de DD/MM/YYYY: ");
+            printf("Entrer la date a rechercher sous forme de DD/MM/YY (01/01/24): ");
             fgets(date, 20, stdin);
             date[strcspn(date, "\n")] = '\0';
             searchbyDate(date);
@@ -348,6 +342,7 @@ void search() {
             scanf("%d", &c_id);
             getchar();
             searchbyCID(c_id);
+            break;
         case 5:
             printf("Entrer le status a rechercher: 0 pour en cours 1 pour Resolu 2 pour Fermee: ");
             scanf("%d", &stat);
@@ -700,6 +695,19 @@ void manage_tickets_mod()
                 printf("fermee\n");
                 break;
             }
+                printf("Priority: ");
+                switch (tickets[i].priority)
+                {
+                case 0:
+                    printf("basse\n");
+                    break;
+                case 1:
+                    printf("moyenne\n");
+                    break;
+                case 2:
+                    printf("Haute\n");
+                    break;
+                }
                 printf("=========================================\n");
                 }
             }
@@ -793,7 +801,7 @@ void rapport(){
         }
         
     }
-    if(resolved != 0){
+    if(resolved == 0){
         printf("No ticket got resolved\n");
         return;
     }
@@ -830,9 +838,10 @@ void admin_menu()
     {
         printf("===============MENU===============\n");
         printf("[1] Gestion des Reclamations\n");
-        printf("[2] Traitement des Reclamations\n");
-        printf("[3] Generer un rapport\n");
-        printf("[3] Retour\n");
+        printf("[2] Gestion des utilisateurs\n");
+        printf("[3] Traitement des Reclamations\n");
+        printf("[4] Generer un rapport\n");
+        printf("[5] Retour\n");
         printf("==================================\n");
         printf("Entrer Votre choix: ");
         scanf("%d", &choix);
@@ -842,18 +851,21 @@ void admin_menu()
         case 1:
             manage_tickets_mod();
             break;
-        case 2:
+        case 3:
             process_tickets(); // Proccess Tickets as Mode
             break;
-        case 3:
-            rapport();
+        case 2:
+            manage_users();
+            break;
         case 4:
+            rapport();
+        case 5:
             break;
         default:
             printf("Choix Incorrect!!!\n");
             break;
         }
-    } while (choix != 3);
+    } while (choix != 5);
 }
 
 /* Manage Users Function  */
@@ -892,7 +904,7 @@ void manage_users()
             printf("Entrer l'identifiant d'utilisateur a supprimer: ");
             scanf("%d", &user_id);
             getchar();
-            if (user_id < users_count)
+            if (user_id <= users_count)
             {
                 for (int i = user_id; i < users_count - 1; i++)
                 {
@@ -1000,7 +1012,13 @@ void delete_user_ticket(int user_id)
     printf("Entrer l'identifiant du reclamation a supprimer: ");
     scanf("%d", &target_id);
     getchar();
-
+    time_t newt = time(NULL);
+    double diff = difftime(newt, tickets[target_id - 1].date);
+    if (diff > 10)
+    {
+        printf("La reclamation a depassee le temps necessaire pour la suppression\n");
+        return;
+    }
     for (int i = 0; i < tickets_count; i++)
     {
         if (tickets[i].id == target_id && tickets[i].owner_id == user_id)
