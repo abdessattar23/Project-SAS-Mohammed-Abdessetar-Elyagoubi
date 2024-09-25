@@ -118,7 +118,7 @@ void signup()
     system("@cls||clear");
     // Display newly created profile
     printf("\n************************************************************\n");
-    printf("         *** PROFIL CRee AVEC SUCCeS ***                    \n");
+    printf("         *** PROFIL CREE AVEC SUCCES ***                    \n");
     printf("************************************************************\n");
     printf("[*] Identifiant         : %d\n", users[users_count].id);
     printf("[*] Nom Complet         : %s\n", users[users_count].fullname);
