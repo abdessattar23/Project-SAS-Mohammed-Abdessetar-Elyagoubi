@@ -733,128 +733,137 @@ void manage_tickets_mod()
         case 1:
             for (int i = 0; i < tickets_count; i++)
             {
-                char date[20];
-                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
-                if (tickets[i].priority == 2)
+                if (tickets[i].id != -1)
                 {
-                    printf("===========Reclamation %d================\n", i);
-                    printf("Identifiant: %d\n", tickets[i].id);
-                    printf("Motif: %s\n", tickets[i].motif);
-                    printf("Description: %s\n", tickets[i].description);
-                    printf("Categorie: %s\n", tickets[i].categorie);
-                    printf("Status: ");
-                    switch (tickets[i].status)
+                    char date[20];
+                    strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+                    if (tickets[i].priority == 2)
                     {
-                    case 0:
-                        printf("en cours\n");
-                        break;
-                    case 1:
-                        printf("resolved\n");
-                        break;
-                    case 2:
-                        printf("fermee\n");
-                        break;
+                        printf("===========Reclamation================\n", i);
+                        printf("Identifiant: %d\n", tickets[i].id);
+                        printf("Motif: %s\n", tickets[i].motif);
+                        printf("Description: %s\n", tickets[i].description);
+                        printf("Categorie: %s\n", tickets[i].categorie);
+                        printf("Status: ");
+                        switch (tickets[i].status)
+                        {
+                        case 0:
+                            printf("en cours\n");
+                            break;
+                        case 1:
+                            printf("resolved\n");
+                            break;
+                        case 2:
+                            printf("fermee\n");
+                            break;
+                        }
+                        printf("Date: %s\n", date);
+                        printf("Owner ID: %d\n", tickets[i].owner_id);
+                        printf("Priority: ");
+                        switch (tickets[i].priority)
+                        {
+                        case 0:
+                            printf("basse\n");
+                            break;
+                        case 1:
+                            printf("moyenne\n");
+                            break;
+                        case 2:
+                            printf("Haute\n");
+                            break;
+                        }
+                        printf("=========================================\n");
                     }
-                    printf("Date: %s\n", date);
-                    printf("Owner ID: %d\n", tickets[i].owner_id);
-                    printf("Priority: ");
-                    switch (tickets[i].priority)
-                    {
-                    case 0:
-                        printf("basse\n");
-                        break;
-                    case 1:
-                        printf("moyenne\n");
-                        break;
-                    case 2:
-                        printf("Haute\n");
-                        break;
-                    }
-                    printf("=========================================\n");
                 }
             }
             for (int i = 0; i < tickets_count; i++)
             {
-                char date[20];
-                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
-                if (tickets[i].priority == 1)
+                if (tickets[i].id != -1)
                 {
-                    printf("===========Reclamation %d================\n", i);
-                    printf("Identifiant: %d\n", tickets[i].id);
-                    printf("Motif: %s\n", tickets[i].motif);
-                    printf("Description: %s\n", tickets[i].description);
-                    printf("Categorie: %s\n", tickets[i].categorie);
-                    printf("Status: ");
-                    switch (tickets[i].status)
+                    char date[20];
+                    strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+                    if (tickets[i].priority == 1)
                     {
-                    case 0:
-                        printf("en cours\n");
-                        break;
-                    case 1:
-                        printf("resolved\n");
-                        break;
-                    case 2:
-                        printf("fermee\n");
-                        break;
+                        printf("===========Reclamation %d================\n", i);
+                        printf("Identifiant: %d\n", tickets[i].id);
+                        printf("Motif: %s\n", tickets[i].motif);
+                        printf("Description: %s\n", tickets[i].description);
+                        printf("Categorie: %s\n", tickets[i].categorie);
+                        printf("Status: ");
+                        switch (tickets[i].status)
+                        {
+                        case 0:
+                            printf("en cours\n");
+                            break;
+                        case 1:
+                            printf("resolved\n");
+                            break;
+                        case 2:
+                            printf("fermee\n");
+                            break;
+                        }
+                        printf("Date: %s\n", date);
+                        printf("Owner ID: %d\n", tickets[i].owner_id);
+                        printf("Priority: ");
+                        switch (tickets[i].priority)
+                        {
+                        case 0:
+                            printf("basse\n");
+                            break;
+                        case 1:
+                            printf("moyenne\n");
+                            break;
+                        case 2:
+                            printf("Haute\n");
+                            break;
+                        }
+                        printf("=========================================\n");
                     }
-                    printf("Date: %s\n", date);
-                    printf("Owner ID: %d\n", tickets[i].owner_id);
-                    printf("Priority: ");
-                    switch (tickets[i].priority)
-                    {
-                    case 0:
-                        printf("basse\n");
-                        break;
-                    case 1:
-                        printf("moyenne\n");
-                        break;
-                    case 2:
-                        printf("Haute\n");
-                        break;
-                    }
-                    printf("=========================================\n");
                 }
             }
             for (int i = 0; i < tickets_count; i++)
             {
-                char date[20];
-                strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
-                if (tickets[i].priority == 0)
+                if (tickets[i].id != -1)
                 {
-                    printf("===========Reclamation %d================\n", i);
-                    printf("Identifiant: %d\n", tickets[i].id);
-                    printf("Motif: %s\n", tickets[i].motif);
-                    printf("Description: %s\n", tickets[i].description);
-                    printf("Categorie: %s\n", tickets[i].categorie);
-                    printf("Status: ");
-                    switch (tickets[i].status)
+                    char date[20];
+                    strftime(date, sizeof(date), "%d/%m/%y - %H:%M:%S", localtime(&tickets[i].date));
+                    if (tickets[i].priority == 0)
                     {
-                    case 0:
-                        printf("en cours\n");
-                        break;
-                    case 1:
-                        printf("resolved\n");
-                        break;
-                    case 2:
-                        printf("fermee\n");
-                        break;
+                        printf("===========Reclamation %d================\n", i);
+                        printf("Identifiant: %d\n", tickets[i].id);
+                        printf("Motif: %s\n", tickets[i].motif);
+                        printf("Description: %s\n", tickets[i].description);
+                        printf("Categorie: %s\n", tickets[i].categorie);
+                        printf("Status: ");
+                        switch (tickets[i].status)
+                        {
+                        case 0:
+                            printf("en cours\n");
+                            break;
+                        case 1:
+                            printf("resolved\n");
+                            break;
+                        case 2:
+                            printf("fermee\n");
+                            break;
+                        }
+                        printf("Date: %s\n", date);
+                        printf("Owner ID: %d\n", tickets[i].owner_id);
+                        printf("Priority: ");
+                        switch (tickets[i].priority)
+                        {
+                        case 0:
+                            printf("basse\n");
+                            break;
+                        case 1:
+                            printf("moyenne\n");
+                            break;
+                        case 2:
+                            printf("Haute\n");
+                            break;
+                        }
+                        printf("=========================================\n");
                     }
-                    printf("Date: %s\n", date);
-                    printf("Owner ID: %d\n", tickets[i].owner_id);
-                    printf("Priority: ");
-                    switch (tickets[i].priority)
-                    {
-                    case 0:
-                        printf("basse\n");
-                        break;
-                    case 1:
-                        printf("moyenne\n");
-                        break;
-                    case 2:
-                        printf("Haute\n");
-                        break;
-                    }
-                    printf("=========================================\n");
                 }
             }
             break;
